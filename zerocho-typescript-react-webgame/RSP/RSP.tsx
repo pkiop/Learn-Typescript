@@ -1,40 +1,83 @@
 import * as React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 
-const val = ['rock', 'scissors', 'paper'];
+const rspCoords = {
+  바위: '0',
+  가위: '-142px',
+  보: '-284px'
+} as const;
+
+const scores = {
+  가위: 1,
+  바위: 0,
+  보: -1
+} as const;
+
+// type imgCoords = '0' | '-142px' | '-284';
+type ImgCoords = typeof rspCoords[keyof typeof rspCoords];
+
 
 const RSP = () => {
-  const [hands, setHands] = useState('');
-  const [myHands, setMyHands] = useState('');
   const [result, setResult] = useState('');
+  const [imgCoord, setImgCoord] = useState<ImgCoords>(rspCoords.바위);
+  const [score, setScore] = useState(0);
+  const interval = useRef<number>();
 
-  const play = async (myHandValue: string) => {
-    const systemHand = val[Math.floor(Math.random()*3)];
-    setHands(systemHand);
-    if(systemHand === myHandValue) {
-      setResult('비겼습니다.');
-      console.log("set 비겼습니다.");
-    } else {
-      setResult('귀찮습니다.');
-      console.log("set 귀찮습니다..");
+  React.useEffect(() => {
+    console.log('다시 실행');
+    interval.current = window.setInterval(changeHand, 100);
+    return () => {
+      console.log('종료');
+      clearInterval(interval.current);
     }
+  } ,[imgCoord]);
+
+  const onClickBtn = (choice: keyof typeof rspCoords) => () => {
+    clearInterval(interval.current);
+    const myScore = scores[choice];
+    const cpuScore = scores[computerChoice(imgCoord)];
+    const diff = myScore - cpuScore;
+    if(diff === 0) {
+      setResult('비겼습니다!');
+    } else if ([-1, 2].includes(diff)) {
+      setResult('이겼습니다!');
+      setScore((prevScore) => prevScore+1);
+    } else {
+      setResult('졌습니다!');
+      setScore((prevScore) => prevScore - 1);
+    }
+    setTimeout(() => {
+      interval.current = window.setInterval(changeHand, 100);
+    }, 1000);
   }
 
-  const onClick = useCallback( async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    const myHandValue= e.currentTarget.value;
-    setMyHands(myHandValue);
-    play(myHandValue);
-  }, [hands, myHands, result]);
+  const changeHand = () => {
+    if(imgCoord === rspCoords.바위) {
+      setImgCoord(rspCoords.가위)
+    } else if(imgCoord === rspCoords.가위) {
+      setImgCoord(rspCoords.보)
+    } else if(imgCoord === rspCoords.보) {
+      setImgCoord(rspCoords.바위)
+    }
+  };
+
+  const computerChoice = (imgCoords: ImgCoords) => {
+    return (Object.keys(rspCoords) as ['바위', '가위', '보']).find((k) => {
+      return rspCoords[k] === imgCoords;
+    })!
+  }
+  
 
   return (
     <>
-      {hands === '' ? '' : <div>PC는 {hands} 를 낸 상태입니다.</div>}
-      <div>{myHands} 를 낸 상태입니다.</div>
-      <button onClick={onClick} value='rock'>ROCK</button>
-      <button onClick={onClick} value='scissors'>SCISSORS</button>
-      <button onClick={onClick} value='paper'>PAPER</button>
-      {result === '' ? '' : <div>결과는 "{result}" 입니다.</div>}
+      <div id="computer" style={{ background: `url(https://en.pimg.jp/023/182/267/1/23182267.jpg) ${imgCoord} 0`}} />
+      <div>
+        <button id="rock" className="btn" onClick={onClickBtn('바위')}>바위</button>
+        <button id="scissor" className="btn" onClick={onClickBtn('가위')}>가위</button>
+        <button id="paper" className="btn" onClick={onClickBtn('보')}>보</button>
+      </div>
+      <div>{result}</div>
+      <div>현재 {score}점</div>
     </>
   )
 }
