@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { Component, createRef } from 'react';
+import * as React from './node_modules/@types/react';
+import { Component, createRef } from './node_modules/@types/react';
 
 interface State {
   word: string,

@@ -1,6 +1,6 @@
-import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import { hot } from 'react-hot-loader/root';
+import * as React from './node_modules/@types/react';
+import * as ReactDOM from './node_modules/@types/react-dom';
+import { hot } from './node_modules/react-hot-loader/root';
 
 import WordRelay from './WordRelayClass';
 

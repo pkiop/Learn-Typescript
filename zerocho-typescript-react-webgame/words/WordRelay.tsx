@@ -1,5 +1,5 @@
-import * as React from 'react';
-import { useState, useCallback ,useRef} from 'react';
+import * as React from './node_modules/@types/react';
+import { useState, useCallback ,useRef} from './node_modules/@types/react';
 
 const WordRelay = () => {
   const [word, setWord] = useState('abc');
