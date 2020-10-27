@@ -1,9 +1,21 @@
 import * as React from 'react';
 import { Component } from 'react';
+import { Dispatch } from 'redux'; // react에도 있긴 함
 import { connect } from 'react-redux';
-import {logIn, logOut } from './actions/user';
+import { logIn, logOut } from './actions/user';
+import { RootState } from './reducers';
+import { UserState } from './reducers/user';
 
-class App extends Component {
+interface StateToProps {
+  user: UserState,
+}
+
+interface DispatchToProps {
+  dispatchLogIn: ({id, password}: {id: string, password: string}) => void,
+  dispatchLogOut: () => void,
+}
+
+class App extends Component<StateToProps & DispatchToProps> {
 
   onClick = () => {
     this.props.dispatchLogIn({
@@ -34,13 +46,13 @@ class App extends Component {
   }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: RootState) => ({
   user: state.user,
   posts: state.posts,
 }); // reselect 쓸 분은 쓰세요
 
-const mapDispatchToProps = (dispatch) => ({
-  dispatchLogin: (data: {id, password}) => dispatch(logIn(data)),
-  dispatchLogOut: () => dispatch(logOut());
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  dispatchLogin: (data: {id: string, password: string}) => dispatch(logIn(data)),
+  dispatchLogOut: () => dispatch(logOut()),
 })
 export default connect(mapStateToProps, mapDispatchToProps)(App);
