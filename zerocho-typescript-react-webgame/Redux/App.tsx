@@ -3,6 +3,19 @@ import { Component } from 'react';
 import { connect } from 'react-redux';
 
 class App extends Component {
+
+  onClick = () => {
+    this.props.dispatchLogIn({
+      id: 'zerocho',
+      password: '비밀번호',
+    })
+  }
+
+  onLogout = () => {
+    this.props.dispatchLogOut();
+  }
+
+
   render() {
     const { user } = this.props;
     return (
@@ -19,3 +32,14 @@ class App extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  user: state.user,
+  posts: state.posts,
+}); // reselect 쓸 분은 쓰세요
+
+const mapDispatchToProps = (dispatch) => ({
+  dispatchLogin: (data: {id, password}) => dispatch(logIn(data)),
+  dispatchLogOut: () => dispatch(logOut());
+})
+export default connect(mapStateToProps, mapDispatchToProps)(App);
